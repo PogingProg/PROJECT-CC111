@@ -5,6 +5,16 @@
 #include <time.h>
 #include <string.h>
 
+char year;
+
+void yearLevel() {
+    printf("WHAT'S YOUR YEAR LEVEL: \n");
+    printf("[1] 1ST YEAR \n");
+    printf("[2] 2ND YEAR \n");
+    printf("[3] 3RD YEAR \n");
+    year = getch();
+}
+
 void loadingscreen() {
     int width = 20; // Width of the loading bar
 
@@ -341,12 +351,122 @@ void teachersAttendance() {
     printf("\033[0m");
 }
 
+float generateRandomGrade() {
+    float grades[] = {1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 4.0, 5.0};
+    int index = rand() % (sizeof(grades) / sizeof(grades[0]));
+    return grades[index];
+}
+
+char* evaluateGrade(float grade) {
+    if (grade == 5.0 || grade == 4.0) {
+        return "FAILED";
+    } else if (grade <= 3.0) {
+        return "PASSED";
+    } else {
+        return "INCOMPLETE";
+    }
+}
+
+void printSubjectDetails(char* code, char* description, float grade) {
+    printf("\033[48;5;234m\033[38;5;15m"); // Set background to dark gray, text to white
+    printf("                   | %-15s | %-40s |     %.2f      | %-12s |\n", 
+           code, description, grade, evaluateGrade(grade));
+    printf("\033[0m"); // Reset to default colors
+}
+
 void eogRequest() {
-	printf("\033[H"); // Move cursor to the top-left corner
+    char course[100], yearLevel[100], studentStatus[20], studentNumber[20], studentName[100], schoolYear[100];
+    float grades[18];
+    char subjects[18][50] = {
+        "UNDERSTANDING THE SELF", "READINGS IN PHIL. HISTORY", "PURPOSIVE COMMUNICATION",
+        "MATHEMATICS IN THE MODERN WORLD", "INTRODUCTION TO COMPUTING", 
+        "FUNDAMENTAL OF PROGRAMMING 1", "PHILTECH LIFE AND SPIRIT", "READINGS IN THE PHILIPPINE HISTORY", 
+        "PHYSICAL FITNESS 1", "NATIONAL SERVICE TRAINING PROGRAM 1", "ETHICS", "WEB SYSTEM AND TECHNOLOGIES",
+        "ART APPRECIATION", "INTERMEDIATE PROGRAMMING", "COMPUTER SYSTEM SERVICING", "PHYSICAL FITNESS 2",
+        "NATIONAL TRAINING PROGRAM 2", "VISUAL GRAPHIC DESIGN"
+    };
+    char codes[18][10] = {
+        "GE1", "GE2", "GE3", "GE4", "CC111", "CC112", "PLS", "PE1", "NSTP", "GE5",
+        "WST", "CSS121", "PE2", "NSTP2", "VGD"
+    };
+    
+    printf("\033[H"); // Move cursor to the top-left corner
     printf("\033[48;5;52m\033[38;5;15m"); // Background maroon, text white
     printf("\033[2J"); // Clear screen
+
+    // Initialize random number generator
+    srand(time(0));
+
+    printf("\033[48;5;52m\033[38;5;15m"); // Background maroon, text white
+    printf("                    -------------------------------------------------------------------------------------------------\n");
+    printf("                   |                                   EVALUATION OF GRADES REQUEST                                  |\n");
+    printf("                    -------------------------------------------------------------------------------------------------\n");
+    printf("\033[0m"); // Reset to default colors
+
+    // Get student details
+    printf("\033[48;5;52m\033[38;5;15m"); // Background maroon, text white
+    printf("                    Enter your course: ");
+    printf("\033[0m"); // Reset to default colors
+    fgets(course, sizeof(course), stdin);
+    course[strcspn(course, "\n")] = 0;
+
+    printf("\033[48;5;52m\033[38;5;15m"); // Background maroon, text white
+    printf("                    Enter your year level: ");
+    printf("\033[0m"); // Reset to default colors
+    fgets(yearLevel, sizeof(yearLevel), stdin);
+    yearLevel[strcspn(yearLevel, "\n")] = 0;
+
+    printf("\033[48;5;52m\033[38;5;15m"); // Background maroon, text white
+    printf("                    Enter your student status (Regular, Non-Regular): ");
+    printf("\033[0m"); // Reset to default colors
+    fgets(studentStatus, sizeof(studentStatus), stdin);
+    studentStatus[strcspn(studentStatus, "\n")] = 0;
+
+    printf("\033[48;5;52m\033[38;5;15m"); // Background maroon, text white
+    printf("                    Enter your student number: ");
+    printf("\033[0m"); // Reset to default colors
+    fgets(studentNumber, sizeof(studentNumber), stdin);
+    studentNumber[strcspn(studentNumber, "\n")] = 0;
+
+    printf("\033[48;5;52m\033[38;5;15m"); // Background maroon, text white
+    printf("                    Enter your student name: ");
+    printf("\033[0m"); // Reset to default colors
+    fgets(studentName, sizeof(studentName), stdin);
+    studentName[strcspn(studentName, "\n")] = 0;
+
+    printf("\033[48;5;52m\033[38;5;15m"); // Background maroon, text white
+    printf("                    Enter your school year: ");
+    printf("\033[0m"); // Reset to default colors
+    fgets(schoolYear, sizeof(schoolYear), stdin);
+    schoolYear[strcspn(schoolYear, "\n")] = 0;
+
+    sleep(2);
+
+    #ifdef _WIN32
+        system("cls"); // Windows
+    #else
+        system("clear"); // Linux/macOS
+    #endif
     
-    printf("EOG request!\n");
+    // Generate random grades for all subjects
+    for (int i = 0; i < 18; i++) {
+        grades[i] = generateRandomGrade();
+    }
+
+    printf("\033[48;5;52m\033[38;5;15m"); // Background maroon, text white
+    printf("                    --------------------------------------------------------------------------------------------\n");
+    printf("                   | Student Name: %-26s       Status: %-33s|\n", studentName, studentStatus);
+    printf("                   | Student Number: %-24s       School Year: %-28s|\n", studentNumber, schoolYear);
+    printf("                   | Course: %-32s       Year Level: %-29s|\n", course, yearLevel);
+    printf("                   ---------------------------------------------------------------------------------------------\n");
+    printf("                   |  SUBJECT CODE   |           DESCRIPTION                    |    GRADES     |  EVALUATION  |\n");
+    printf("                   |-----------------|------------------------------------------|---------------|--------------|\n");
+    printf("\033[0m"); // Reset to default colors
+
+    // Print details of all subjects
+    for (int i = 0; i < 18; i++) {
+        printSubjectDetails(codes[i], subjects[i], grades[i]);
+    }
 }
 
 void enrollment() {
@@ -364,7 +484,7 @@ void enrollment() {
     int editField;
 
     printf("+--------------------------------------------------------------------------------------------------------------------+\n");
-    printf("||             \t\t\t\t        >>>ENROLLMENT FORM<<<          \t\t\t\t           ||\n");
+    printf("||             \t\t\t\t           ENROLLMENT FORM             \t\t\t\t            ||\n");
     printf("+--------------------------------------------------------------------------------------------------------------------+\n");
 
     printf("|| Full Name:                ");
@@ -564,7 +684,7 @@ void exitScreen() {
 
     // Completed loading bar
     printf("\t\t\t\t\t------------------------------------------\n");
-    printf("\t\t\t\t\t|           YOU HAVE A GREAT DAY!        |\n");
+    printf("\t\t\t\t\t|          YOU HAVE A GREAT DAY!         |\n");
     printf("\t\t\t\t\t------------------------------------------\n");
     sleep(2);
 
@@ -640,4 +760,3 @@ int main() {
         }
     }
 }
-
